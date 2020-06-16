@@ -3,11 +3,21 @@ package sw2.lab6.teletok.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import sw2.lab6.teletok.entity.Post;
+import sw2.lab6.teletok.entity.PostComment;
+import sw2.lab6.teletok.entity.PostLike;
+import sw2.lab6.teletok.entity.User;
 import sw2.lab6.teletok.repository.PostCommentRepository;
 import sw2.lab6.teletok.repository.PostLikeRepository;
 import sw2.lab6.teletok.repository.PostRepository;
 import sw2.lab6.teletok.repository.UserRepository;
+
+import javax.servlet.http.HttpSession;
+import java.util.ArrayList;
+import java.util.List;
 
 @Controller
 public class PostController {
@@ -45,21 +55,34 @@ public class PostController {
     }
 
     @GetMapping("/post/{id}")
-    public String viewPost(Model model) {
-        model.addAttribute("listaPost",postRepository.findAll());
-        model.addAttribute("listaUser",userRepository.findAll());
-        model.addAttribute("listaLike",postLikeRepository.findAll());
-        model.addAttribute("listaComment",postCommentRepository.findAll());
+    public String viewPost(Model model, @RequestParam("id") int id, RedirectAttributes attr) {
+        User user = postRepository.findById(id).get().getUser();
+        Integer cantidadLikes = postLikeRepository.cantidadLikes(id);
+        List<PostComment> listaComentario = postCommentRepository.findByPost(postRepository.findById(id).get());
+
+        model.addAttribute("postAver", postRepository.findById(id));
+        model.addAttribute("usuarioDePost", user);
+        model.addAttribute("cantidadLikes", cantidadLikes);
+        model.addAttribute("listaComentarios",listaComentario);
+
         return "post/view";
     }
 
     @PostMapping("/post/comment")
-    public String postComment() {
-        return "";
+    public String postComment(@ModelAttribute("comentario") PostComment postComment,
+                              BindingResult bindingResult,
+                              RedirectAttributes attr,
+                              Model model,
+                              HttpSession session) {
+
+
+        return "redirect:/post/{id}";
     }
 
     @PostMapping("/post/like")
     public String postLike() {
+
+
         return "";
     }
 }
