@@ -9,7 +9,7 @@
 
         <div class="col mb-4" th:each="posten, i: ${listapost}">
             <div class="card">
-                <img th:src="@{/img/huaraz.jpg}" class="card-img-top" style="height: 150px;">
+                <img th:src="@{|fileUploaded/${posten.mediaUrl}|}" class="card-img-top" style="height: 150px;">
                 <a th:href="@{/post/}">
                     <div class="card-img-overlay">
                         <h6 class="card-title text-white text-center mt-5" style="text-shadow: 2px 2px 4px #000000;">
@@ -29,7 +29,6 @@
                 </div>
             </div>
         </div>
-
     </div>
 </div>
 <div th:replace="fragments/base.html :: jsScripts"></div>

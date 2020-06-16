@@ -28,8 +28,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .deleteCookies("JSESSIONID")
                 .invalidateHttpSession(true);
 
-        http.authorizeRequests()
-                .anyRequest().permitAll();
+        http.authorizeRequests().antMatchers("/post/new").hasAuthority("USER");
+        http.authorizeRequests().anyRequest().permitAll();
     }
 
     @Autowired

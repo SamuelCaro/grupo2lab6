@@ -4,6 +4,7 @@
 <body>
 <div class="container container-app">
     <div th:replace="fragments/header.html :: header"></div>
+    <div th:if="${msg != null}" th:text="${msg}" class="alert alert-danger mt-3" role="alert"></div>
     <div class="row justify-content-md-center mt-3">
         <div class="col col-xs-12 col-md-6">
             <div class="card">
@@ -11,14 +12,21 @@
                     Nuevo Post
                 </div>
                 <div class="card-body">
-                    <form action="#" method="post">
+                    <form th:action="@{'/post/save'}" enctype="multipart/form-data" method="post" th:object="${post}">
+                        <input type="hidden" name="id" th:value="${post.getId()}"/>
                         <div class="form-group">
                             <label for="description">Descripción</label>
-                            <textarea class="form-control" id="description" name="description"></textarea>
+                            <textarea class="form-control" th:field="${post.description}"></textarea>
+                        </div>
+                        <div class="text-danger" th:if="${#fields.hasErrors('description')}"
+                             th:errors="*{description}">Error
                         </div>
                         <div class="form-group">
-                            <label for="description">Foto</label>
-                            <input type="file" class="form-control">
+                            <label for="mediaUrl">Foto</label>
+                            <input type="file" class="form-control" id="archivo" name="archivo">
+                        </div>
+                        <div class="text-danger" th:if="${#fields.hasErrors('mediaUrl')}"
+                             th:errors="*{mediaUrl}">Error
                         </div>
                         <button type="submit" class="btn btn-primary btn-block">Publicar</button>
                     </form>
