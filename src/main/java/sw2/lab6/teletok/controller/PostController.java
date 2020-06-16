@@ -11,13 +11,24 @@ import sw2.lab6.teletok.entity.Post;
 import sw2.lab6.teletok.entity.User;
 import sw2.lab6.teletok.repository.PostRepository;
 import sw2.lab6.teletok.service.StorageService;
-
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.HashMap;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import sw2.lab6.teletok.entity.Post;
+import sw2.lab6.teletok.entity.PostComment;
+import sw2.lab6.teletok.entity.PostLike;
+import sw2.lab6.teletok.entity.User;
+import sw2.lab6.teletok.repository.PostCommentRepository;
+import sw2.lab6.teletok.repository.PostLikeRepository;
+import sw2.lab6.teletok.repository.PostRepository;
+import sw2.lab6.teletok.repository.UserRepository;
+
+import javax.servlet.http.HttpSession;
+import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -27,14 +38,22 @@ public class PostController {
     @Autowired
     PostRepository postRepository;
 
+    @Autowired
+    UserRepository userRepository;
+
+    @Autowired
+    PostLikeRepository postLikeRepository;
+
+    @Autowired
+    PostCommentRepository postCommentRepository;
+
     @GetMapping(value = {"", "/"})
-    public String listPost(Model model) {
-        List<Post> listaPosts = postRepository.findAll();
-        model.addAttribute("listaPosts", listaPosts);
+    public String listPost() {
         return "post/list";
     }
 
     @GetMapping("/post/new")
+
     public String newPost(@ModelAttribute("post") Post post, Model model) {
         List<Post> listaPosts = postRepository.findAll();
         model.addAttribute("listaPosts", listaPosts);
@@ -75,17 +94,34 @@ public class PostController {
     }
 
     @GetMapping("/post/{id}")
-    public String viewPost() {
+    public String viewPost(Model model, @RequestParam("id") int id, RedirectAttributes attr) {
+        User user = postRepository.findById(id).get().getUser();
+        Integer cantidadLikes = postLikeRepository.cantidadLikes(id);
+        List<PostComment> listaComentario = postCommentRepository.findByPost(postRepository.findById(id).get());
+
+        model.addAttribute("postAver", postRepository.findById(id));
+        model.addAttribute("usuarioDePost", user);
+        model.addAttribute("cantidadLikes", cantidadLikes);
+        model.addAttribute("listaComentarios",listaComentario);
+
         return "post/view";
     }
 
     @PostMapping("/post/comment")
-    public String postComment() {
-        return "";
+    public String postComment(@ModelAttribute("comentario") PostComment postComment,
+                              BindingResult bindingResult,
+                              RedirectAttributes attr,
+                              Model model,
+                              HttpSession session) {
+
+
+        return "redirect:/post/{id}";
     }
 
     @PostMapping("/post/like")
     public String postLike() {
+
+
         return "";
     }
 }

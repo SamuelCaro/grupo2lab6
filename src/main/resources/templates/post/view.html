@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head th:replace="fragments/base.html :: head(title='TeleTok - Ver Post')"></head>
 <body>
 <div class="container container-app">
@@ -14,35 +14,42 @@
                     <div class="row">
                         <div class="col-10">
                             <p class="card-text card-body-app">#huaraz #peru #trip</p>
-                            <p class="card-text"><small class="text-muted">@josebarturen - Publicado hace 25 minutos</small></p>
+                            <p class="card-text"><small class="text-muted"><h3 th:text="${usuarioDePost.username}"></h3>
+                                - Publicado hace 25
+                                minutos</small></p>
                         </div>
                         <div class="col-2 text-right">
-                            <button class="btn btn-link"><i class="fa fa-heart-o"></i> 4</button>
+                            <button class="btn btn-link" th:value="${cantidadLikes}"><i class="fa fa-heart-o"></i> 4
+                            </button>
                         </div>
                     </div>
                 </div>
                 <div class="card-body">
-                    <ul class="list-unstyled" >
-                        <li class="media">
-                            <img th:src="@{/img/avatar.png}" class="mr-3" style="max-width: 30px;">
-                            <div class="media-body">
-                                <h6 class="mt-0 mb-1">@juanperez</h6>
-                                <p>Excelente foto!</p>
-                            </div>
-                        </li>
-                        <li class="media">
-                            <img th:src="@{/img/avatar.png}" class="mr-3" style="max-width: 30px;">
-                            <div class="media-body">
-                                <h6 class="mt-0 mb-1">@josebarturen</h6>
-                                <p>Gracias!</p>
-                            </div>
-                        </li>
-                    </ul>
-                    <form action="#" method="post">
+                    <table>
+                        <tr th:each="comentario:${listaComentarios}">
+                            <ul class="list-unstyled">
+                                <li class="media">
+                                    <img th:src="@{/img/avatar.png}" class="mr-3" style="max-width: 30px;">
+                                    <div class="media-body">
+                                        <h6 class="mt-0 mb-1" th:text="${comentario.getUser().username}">@juanperez</h6>
+                                        <p th:text="${comentario.message}">Excelente foto!</p>
+                                    </div>
+                                </li>
+
+                            </ul>
+                        </tr>
+                    </table>
+                    <form th:action="${/post/comment}" method="post" sec:authorize="hasAnyAuthority('USER')">
                         <div class="form-group">
                             <textarea class="form-control"></textarea>
+                            <input type="text" id="comentario" name="comentario" class="form-control" required
+                                   autofocus>
                         </div>
                         <button type="submit" class="btn btn-primary btn-block">Enviar Comentario</button>
+                    </form>
+                    <form th:action="${/post/like}" method="post" sec:authorize="hasAnyAuthority('USER')">
+
+                        <button type="submit" class="btn btn-primary btn-block">Dar Like</button>
                     </form>
                 </div>
             </div>
