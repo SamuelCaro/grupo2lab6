@@ -22,6 +22,16 @@
                 </div>
             </div>
         </div>
+
+        <table class="table">
+            <tr th:each="post: ${listaPosts}">
+                <td><img th:src="@{|fileUploaded/${post.mediaUrl}|}" class="card-img-top" style="height: 150px;"/></td>
+                    <td th:text="${post.description}"></td>
+                </td>
+            </tr>
+        </table>
+
+
     </div>
 </div>
 <div th:replace="fragments/base.html :: jsScripts"></div>
