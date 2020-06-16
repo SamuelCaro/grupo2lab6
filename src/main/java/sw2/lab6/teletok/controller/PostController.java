@@ -41,9 +41,8 @@ public class PostController {
             Date dateresult = new Date((now.getTime() - post.getCreationDate().getTime()));
             post.setCreationDate(dateresult);
         }
+
         model.addAttribute("listapost", listapost);
-
-
 
         return "post/list";
     }
