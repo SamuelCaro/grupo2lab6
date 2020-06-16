@@ -19,7 +19,6 @@ import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
 @Controller
-@RequestMapping(name = "/user")
 public class UserController {
 
     @Autowired
