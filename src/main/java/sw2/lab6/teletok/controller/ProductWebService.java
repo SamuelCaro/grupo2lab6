@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import sw2.lab6.teletok.DTOO.LikeDto;
 import sw2.lab6.teletok.repository.PostRepository;
 import java.util.HashMap;
 import org.springframework.web.bind.annotation.*;
@@ -27,6 +28,10 @@ public class ProductWebService {
 
     @Autowired
     PostRepository postRepository;
+    @Autowired
+    UserRepository userRepository;
+    @Autowired
+    TokenRepository tokenRepository;
 
     @GetMapping(value = "/ws/post/list", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity listarPosts(@RequestParam("query") String query) {
@@ -40,9 +45,6 @@ public class ProductWebService {
 
     }
 
-    UserRepository userRepository;
-    @Autowired
-    TokenRepository tokenRepository;
 
     @PostMapping(value = "ws/user/signIn", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity signin(
@@ -57,7 +59,7 @@ public class ProductWebService {
             return new ResponseEntity(responseMap, HttpStatus.BAD_REQUEST);
         }
         User usuario = userRepository.findByUsername(username);
-        boolean match = true; //passwordEncoder.matches(usuario.getPassword(), password);
+        boolean match = passwordEncoder.matches(password, usuario.getPassword());
         if(usuario.getUsername().equalsIgnoreCase(username) && match){
             String tokenx = getAlphaNumericString(36);
             Token token = new Token();
@@ -76,6 +78,51 @@ public class ProductWebService {
 
 
 
+
+/*
+    @PostMapping(value = "/ws/post/like", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity likepost(
+            @RequestBody LikeDto likeDto) {
+
+        HashMap<String, Object> responseMap = new HashMap<>();
+        String postId = likeDto.getPostId();
+        String token = likeDto.getToken();
+
+        if (token == null) {
+            responseMap.put("error", "TOKEN_INVALID");
+            return new ResponseEntity(responseMap, HttpStatus.BAD_REQUEST);
+        }if ( postId == null) {
+            responseMap.put("error", "POST_NOT_FOUND");
+            return new ResponseEntity(responseMap, HttpStatus.BAD_REQUEST);
+        }
+        try{
+           int idpost = Integer.parseInt(postId);
+        } catch (NumberFormatException e) {
+            responseMap.put("error", "POST_NOT_FOUND");
+            return new ResponseEntity(responseMap, HttpStatus.BAD_REQUEST);
+        }
+
+
+
+
+        User usuario = userRepository.findByUsername(username);
+        boolean match = true; //passwordEncoder.matches(usuario.getPassword(), password);
+        if(usuario.getUsername().equalsIgnoreCase(username) && match){
+            String tokenx = getAlphaNumericString(36);
+            Token token = new Token();
+            token.setCode(tokenx);
+            token.setUser(usuario);
+            tokenRepository.save(token);
+            responseMap.put("status", "AUTHENTICATED");
+            responseMap.put("token", token.getCode());
+            return new ResponseEntity(responseMap, HttpStatus.OK);
+        }else{
+            responseMap.put("error", "AUTH_FAILED");
+            return new ResponseEntity(responseMap, HttpStatus.BAD_REQUEST);
+        }
+    }
+
+*/
     public String getAlphaNumericString(int n) {
 
         // chose a Character random from this String
@@ -102,4 +149,3 @@ public class ProductWebService {
         return sb.toString();
     }
 }
-
