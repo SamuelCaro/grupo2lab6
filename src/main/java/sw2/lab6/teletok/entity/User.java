@@ -1,11 +1,14 @@
 package sw2.lab6.teletok.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import javax.persistence.*;
 import javax.validation.constraints.*;
 import java.io.Serializable;
 
 @Entity
 @Table(name="user")
+@JsonIgnoreProperties({"id","fullname","password","enable","roleId"})
 public class User implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
