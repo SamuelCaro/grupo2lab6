@@ -1,8 +1,8 @@
 package sw2.lab6.teletok.DTOO;
 
 public class LoginDto {
-    String Username;
-    String Password;
+   private String Username;
+   private String Password;
 
     public String getUsername() {
         return Username;
