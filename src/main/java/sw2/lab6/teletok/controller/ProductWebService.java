@@ -12,8 +12,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import sw2.lab6.teletok.DTOO.LikeDto;
+import sw2.lab6.teletok.entity.Post;
+import sw2.lab6.teletok.entity.PostLike;
+import sw2.lab6.teletok.repository.PostLikeRepository;
 import sw2.lab6.teletok.repository.PostRepository;
 import java.util.HashMap;
+import java.util.Optional;
+
 import org.springframework.web.bind.annotation.*;
 import sw2.lab6.teletok.DTOO.LoginDto;
 import sw2.lab6.teletok.entity.Token;
@@ -32,6 +37,8 @@ public class ProductWebService {
     UserRepository userRepository;
     @Autowired
     TokenRepository tokenRepository;
+    @Autowired
+    PostLikeRepository postLikeRepository;
 
     @GetMapping(value = "/ws/post/list", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity listarPosts(@RequestParam("query") String query) {
@@ -45,7 +52,7 @@ public class ProductWebService {
 
     }
 
-
+//sign in
     @PostMapping(value = "ws/user/signIn", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity signin(
             @RequestBody LoginDto loginDto) {
@@ -59,6 +66,10 @@ public class ProductWebService {
             return new ResponseEntity(responseMap, HttpStatus.BAD_REQUEST);
         }
         User usuario = userRepository.findByUsername(username);
+        if(usuario == null){
+            responseMap.put("error", "AUTH_FAILED");
+            return new ResponseEntity(responseMap, HttpStatus.BAD_REQUEST);
+        }
         boolean match = passwordEncoder.matches(password, usuario.getPassword());
         if(usuario.getUsername().equalsIgnoreCase(username) && match){
             String tokenx = getAlphaNumericString(36);
@@ -79,13 +90,13 @@ public class ProductWebService {
 
 
 
-/*
+//like
     @PostMapping(value = "/ws/post/like", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity likepost(
             @RequestBody LikeDto likeDto) {
 
         HashMap<String, Object> responseMap = new HashMap<>();
-        String postId = likeDto.getPostId();
+        Integer postId = likeDto.getPostId();
         String token = likeDto.getToken();
 
         if (token == null) {
@@ -95,34 +106,39 @@ public class ProductWebService {
             responseMap.put("error", "POST_NOT_FOUND");
             return new ResponseEntity(responseMap, HttpStatus.BAD_REQUEST);
         }
-        try{
-           int idpost = Integer.parseInt(postId);
-        } catch (NumberFormatException e) {
+        Optional<Post> post = postRepository.findById(postId);
+        if(!post.isPresent()){
             responseMap.put("error", "POST_NOT_FOUND");
             return new ResponseEntity(responseMap, HttpStatus.BAD_REQUEST);
         }
-
-
-
-
-        User usuario = userRepository.findByUsername(username);
-        boolean match = true; //passwordEncoder.matches(usuario.getPassword(), password);
-        if(usuario.getUsername().equalsIgnoreCase(username) && match){
-            String tokenx = getAlphaNumericString(36);
-            Token token = new Token();
-            token.setCode(tokenx);
-            token.setUser(usuario);
-            tokenRepository.save(token);
-            responseMap.put("status", "AUTHENTICATED");
-            responseMap.put("token", token.getCode());
-            return new ResponseEntity(responseMap, HttpStatus.OK);
-        }else{
-            responseMap.put("error", "AUTH_FAILED");
+        Optional<Token> tokena = tokenRepository.findByCode(token);
+        if(!tokena.isPresent()){
+            responseMap.put("error", "TOKEN_INVALID");
             return new ResponseEntity(responseMap, HttpStatus.BAD_REQUEST);
         }
+
+        User usuario = tokena.get().getUser();
+        for (PostLike postLike : post.get().getLikes()) {
+            if(postLike.getUser() == tokena.get().getUser()){
+                responseMap.put("error", "LIKE_ALREADY_EXISTS");
+                return new ResponseEntity(responseMap, HttpStatus.BAD_REQUEST);
+            }
+        }
+        PostLike postLike = new PostLike();
+        postLike.setPost(post.get());
+        postLike.setUser(usuario);
+
+        postLikeRepository.save(postLike);
+
+
+        responseMap.put("likeId", postLike.getId());
+        responseMap.put("status", "LIKE_CREATED");
+        return new ResponseEntity(responseMap, HttpStatus.OK);
+
+
+
     }
 
-*/
     public String getAlphaNumericString(int n) {
 
         // chose a Character random from this String

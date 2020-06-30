@@ -1,8 +1,16 @@
 package sw2.lab6.teletok.DTOO;
 
 public class LikeDto {
-    String token;
-    String postId;
+    private String token;
+    private Integer postId;
+
+    public Integer getPostId() {
+        return postId;
+    }
+
+    public void setPostId(Integer postId) {
+        this.postId = postId;
+    }
 
     public String getToken() {
         return token;
@@ -12,11 +20,4 @@ public class LikeDto {
         this.token = token;
     }
 
-    public String getPostId() {
-        return postId;
-    }
-
-    public void setPostId(String postId) {
-        this.postId = postId;
-    }
 }
