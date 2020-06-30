@@ -1,5 +1,7 @@
 package sw2.lab6.teletok.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
@@ -10,6 +12,7 @@ import java.util.List;
 
 @Entity
 @Table(name="post")
+@JsonIgnoreProperties({"comments","likes"})
 public class Post {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
