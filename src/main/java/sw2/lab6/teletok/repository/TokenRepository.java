@@ -7,6 +7,8 @@ import sw2.lab6.teletok.entity.User;
 
 import java.util.Optional;
 
+import java.util.Optional;
+
 @Repository
 public interface TokenRepository  extends JpaRepository<Token,Integer> {
     public Optional<Token> findByCode(String code);
