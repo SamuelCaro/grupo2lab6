@@ -169,7 +169,6 @@ public class ProductWebService {
             sb.append(AlphaNumericString
                     .charAt(index));
         }
-
         return sb.toString();
     }
 }
